@@ -1,7 +1,10 @@
 # CS310PROJECT
-CS310 Proje
 
+[Uygulama adı] – [Uygulamanın ne yaptığını anlatan 1-2 cümle]
 
-Toprak Saçkan
-Kerem Şahinoğlu
-Alp Özdemir 
+## Group 21
+
+- Necdet Alp Özdemir – 33900
+- Toprak Saçkan – 
+- Kerem Şahinoğlu – 
+- Yusuf Arif Özkuttaş – 
