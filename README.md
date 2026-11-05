@@ -1,6 +1,6 @@
-# CS310PROJECT
+# MyHabits
 
-[Uygulama adı] – [Uygulamanın ne yaptığını anlatan 1-2 cümle]
+MyHabits is a mobile habit tracker built with Flutter. Users create daily habits such as "drink 2 L of water" or "study for 1 hour", check them off with one tap, and follow their streaks and weekly progress.
 
 ## Group 21
 
