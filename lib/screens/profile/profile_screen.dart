@@ -5,6 +5,7 @@ import '../../routes.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_spacing.dart';
 import '../../utils/app_text_styles.dart';
+import '../../widgets/primary_button.dart';
 import '../../widgets/stat_tile.dart';
 
 /// Profile & Settings tab. Every row does something; there are no empty
@@ -111,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: ListView(
         padding: AppSpacing.screenPadding,
         children: [
-          const Center(child: _Avatar(url: UserSession.avatarUrl)),
+          Center(child: _Avatar(url: UserSession.avatarUrl)),
           const SizedBox(height: AppSpacing.md),
           Text(
             UserSession.displayName,
@@ -188,14 +189,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          OutlinedButton.icon(
+          PrimaryButton(
+            label: 'Log out',
+            icon: Icons.logout,
+            variant: ButtonVariant.danger,
             onPressed: _logOut,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.danger,
-              side: const BorderSide(color: AppColors.danger, width: 1.5),
-            ),
-            icon: const Icon(Icons.logout),
-            label: const Text('Log out'),
           ),
           const SizedBox(height: AppSpacing.lg),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../routes.dart';
 import '../../utils/app_spacing.dart';
 import '../../utils/app_text_styles.dart';
+import '../../widgets/primary_button.dart';
 
 /// First screen after launch. Shows two local images (the illustration and
 /// the app logo) and lets the user choose to log in or create an account.
@@ -44,14 +45,15 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  ElevatedButton(
+                  PrimaryButton(
+                    label: 'Log in',
                     onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
-                    child: const Text('Log in'),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  OutlinedButton(
+                  PrimaryButton(
+                    label: 'Create account',
+                    variant: ButtonVariant.outlined,
                     onPressed: () => Navigator.pushNamed(context, AppRoutes.signUp),
-                    child: const Text('Create account'),
                   ),
                 ],
               ),
