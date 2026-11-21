@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_colors.dart';
+import '../utils/app_spacing.dart';
+import '../utils/app_text_styles.dart';
+
 /// A 7-column month grid (Monday first).
 ///
 /// - days in [doneDays] are filled dark green
@@ -14,8 +18,8 @@ class MonthCalendar extends StatelessWidget {
     this.doneDays = const {},
     this.partialDays = const {},
     this.today,
-    this.doneColor = const Color(0xFF4E9A6A),
-    this.partialColor = const Color(0xFFCDE8D5),
+    this.doneColor = AppColors.success,
+    this.partialColor = AppColors.successLight,
   });
 
   /// Any date inside the month to show; only year and month are used.
@@ -37,8 +41,6 @@ class MonthCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     // DateTime(year, month + 1, 0) is the last day of `month`.
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     // weekday: Monday = 1 ... Sunday = 7, so Monday needs 0 empty cells.
@@ -62,15 +64,13 @@ class MonthCalendar extends StatelessWidget {
                 child: Center(
                   child: Text(
                     d,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         // The day grid. shrinkWrap + no scrolling so it can live inside
         // a parent ListView / SingleChildScrollView without errors.
         GridView.builder(
@@ -79,8 +79,8 @@ class MonthCalendar extends StatelessWidget {
           itemCount: totalCells,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
-            mainAxisSpacing: 6,
-            crossAxisSpacing: 6,
+            mainAxisSpacing: AppSpacing.xs + 2,
+            crossAxisSpacing: AppSpacing.xs + 2,
           ),
           itemBuilder: (context, index) {
             if (index < leadingBlanks) return const SizedBox.shrink();
@@ -119,26 +119,27 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     final Color background = isDone
         ? doneColor
         : isPartial
             ? partialColor
-            : scheme.surfaceContainerHighest;
+            : AppColors.surface;
 
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(6),
-        border: isToday ? Border.all(color: scheme.primary, width: 2) : null,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        // Today: blue outline. Other days: thin grey border like the wireframe.
+        border: isToday
+            ? Border.all(color: AppColors.primary, width: 2)
+            : Border.all(color: AppColors.border),
       ),
       child: Text(
         '$day',
         style: TextStyle(
           fontSize: 12,
-          color: isDone ? Colors.white : scheme.onSurface,
+          color: isDone ? Colors.white : AppColors.textPrimary,
           fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
         ),
       ),
