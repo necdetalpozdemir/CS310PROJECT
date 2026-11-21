@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_colors.dart';
+import '../utils/app_spacing.dart';
+import '../utils/app_text_styles.dart';
+
 /// A small bordered box that shows one number and a caption under it,
 /// e.g. "12" / "current streak".
 ///
@@ -19,14 +23,15 @@ class StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.md,
+        horizontal: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -36,18 +41,16 @@ class StatTile extends StatelessWidget {
             fit: BoxFit.scaleDown,
             child: Text(
               value,
-              style: theme.textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             label,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: AppTextStyles.caption,
           ),
         ],
       ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_spacing.dart';
+import '../utils/app_text_styles.dart';
+
 /// A labelled text field with an optional leading icon and inline error text.
 ///
 /// Set [isPassword] to true to hide the text and show an eye button
@@ -55,14 +58,13 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(12));
-
+    // Borders, fill color and error colors come from
+    // inputDecorationTheme in app_theme.dart, so they are not set here.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: theme.textTheme.labelLarge),
-        const SizedBox(height: 6),
+        Text(widget.label, style: AppTextStyles.label),
+        const SizedBox(height: AppSpacing.xs + 2),
         TextFormField(
           controller: widget.controller,
           validator: widget.validator,
@@ -84,8 +86,6 @@ class _AppTextFieldState extends State<AppTextField> {
                     onPressed: () => setState(() => _obscure = !_obscure),
                   )
                 : null,
-            border: border,
-            enabledBorder: border,
             // Long error messages wrap instead of being cut off.
             errorMaxLines: 2,
           ),
