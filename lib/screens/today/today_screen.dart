@@ -1,14 +1,179 @@
 import 'package:flutter/material.dart';
 
-// PLACEHOLDER – Yusuf Arif Özkuttaş will replace this file with the real screen.
-class TodayScreen extends StatelessWidget {
+import '../../data/habit_data.dart';
+import '../../data/user_session.dart';
+import '../../models/habit.dart';
+import '../../routes.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_spacing.dart';
+import '../../utils/app_text_styles.dart';
+import '../../widgets/habit_card.dart';
+
+/// Home screen: a greeting, today's completion bar and only the habits
+/// scheduled for today. Tapping the circle checks a habit off in one tap.
+class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
 
   @override
+  State<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends State<TodayScreen> {
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  // "Sun, 22 Nov" – written by hand because the project has no intl package.
+  String _formatDate(DateTime date) =>
+      '${Habit.weekdayNames[date.weekday - 1]}, '
+      '${date.day} ${_months[date.month - 1]}';
+
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    final firstName = UserSession.displayName.split(' ').first;
+    if (hour < 12) return 'Good morning, $firstName';
+    if (hour < 18) return 'Good afternoon, $firstName';
+    return 'Good evening, $firstName';
+  }
+
+  void _toggle(Habit habit) {
+    // The data changes first, then setState tells Flutter to call build again.
+    setState(() => HabitData.toggleDone(habit, DateTime.now()));
+  }
+
+  Future<void> _addHabit() async {
+    await Navigator.pushNamed(context, AppRoutes.addHabit);
+    // A new habit may be scheduled for today, so rebuild when we come back.
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final habits =
+        HabitData.habits.where((habit) => habit.isScheduledOn(today)).toList();
+    final doneCount = habits.where((habit) => habit.isDoneOn(today)).length;
+    final ratio = habits.isEmpty ? 0.0 : doneCount / habits.length;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Today')),
-      body: const Center(child: Text('Today – coming soon')),
+      appBar: AppBar(
+        title: const Text('Today'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.lg),
+            child: Center(
+              child: Text(_formatDate(today), style: AppTextStyles.caption),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Add habit',
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        onPressed: _addHabit,
+        child: const Icon(Icons.add),
+      ),
+      // One ListView for the whole page, so it scrolls on small phones.
+      body: ListView(
+        padding: AppSpacing.listPadding,
+        children: [
+          Text(_greeting, style: AppTextStyles.title),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '$doneCount of ${habits.length} done',
+                  style: AppTextStyles.caption,
+                ),
+              ),
+              Text('${(ratio * 100).round()}%', style: AppTextStyles.caption),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 8,
+              color: AppColors.primary,
+              backgroundColor: AppColors.border,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          const _QuoteBox(text: 'Small steps every day.'),
+          const SizedBox(height: AppSpacing.lg),
+          if (habits.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xxl),
+              child: Text(
+                'Nothing scheduled for today.\nTap + to add a habit.',
+                textAlign: TextAlign.center,
+                style:
+                    AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              ),
+            ),
+          for (final habit in habits) ...[
+            _buildHabitCard(habit, today),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHabitCard(Habit habit, DateTime today) {
+    final streak = habit.currentStreak;
+    final done = habit.isDoneOn(today);
+
+    return HabitCard(
+      key: ValueKey(habit.id),
+      habit: habit,
+      subtitle: streak > 0 ? '$streak-day streak' : 'Start a streak today',
+      subtitleIcon: streak > 0 ? Icons.local_fire_department : null,
+      trailing: IconButton(
+        tooltip: done ? 'Mark as not done' : 'Mark as done',
+        onPressed: () => _toggle(habit),
+        icon: Icon(
+          done ? Icons.check_circle : Icons.radio_button_unchecked,
+          color: done ? AppColors.success : AppColors.textHint,
+          size: 30,
+        ),
+      ),
+    );
+  }
+}
+
+/// The motivational line under the progress bar, with a blue bar on the left.
+class _QuoteBox extends StatelessWidget {
+  const _QuoteBox({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    // A one-sided Border can't have a borderRadius, so the corners are
+    // rounded by clipping instead.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.primaryLight.withValues(alpha: 0.5),
+          border: const Border(
+            left: BorderSide(color: AppColors.primary, width: 3),
+          ),
+        ),
+        child: Text(
+          '"$text"',
+          style: AppTextStyles.body.copyWith(
+            fontStyle: FontStyle.italic,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 }
