@@ -16,6 +16,8 @@ import 'add_edit_habit_screen.dart';
 /// "Mark today as done", edit (pen) and delete.
 ///
 /// Opened with Navigator.push from a card on Today or My Habits.
+/// If the habit is deleted here, the screen pops with the habit's old
+/// index (an int), so the caller can offer Undo.
 class HabitDetailScreen extends StatefulWidget {
   const HabitDetailScreen({super.key, required this.habit});
 
@@ -87,12 +89,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     );
     if (!confirmed || !mounted) return;
 
-    HabitData.remove(_habit);
-    // The SnackBar lives in the app-wide ScaffoldMessenger,
-    // so it stays visible on the screen we go back to.
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('"${_habit.name}" removed')));
-    Navigator.pop(context);
+    final index = HabitData.remove(_habit);
+    // This screen closes now, so it can't offer Undo itself.
+    // It returns the old position instead; the screen we go back to
+    // shows the Undo snackbar and can rebuild its own list.
+    Navigator.pop(context, index);
   }
 
   @override

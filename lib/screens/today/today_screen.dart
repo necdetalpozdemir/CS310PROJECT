@@ -21,6 +21,8 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen> {
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _undoBar;
+
   String get _greeting {
     final hour = DateTime.now().hour;
     final firstName = UserSession.displayName.split(' ').first;
@@ -41,12 +43,53 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   Future<void> _openDetail(Habit habit) async {
-    await Navigator.push(
+    // Habit Detail returns the habit's old index if it was deleted there.
+    final removedAt = await Navigator.push<int>(
       context,
       MaterialPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
     );
+    if (!mounted) return;
     // The habit may have been checked off, edited or deleted there.
-    if (mounted) setState(() {});
+    setState(() {});
+    if (removedAt != null) _showUndo(habit, removedAt);
+  }
+
+  /// Same Undo snackbar as on My Habits.
+  void _showUndo(Habit habit, int index) {
+    final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
+    final bar = messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          '"${habit.name}" removed',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        // Lifts the snackbar above the floating "+" button.
+        margin: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
+        duration: const Duration(seconds: 5),
+        // Without this, a SnackBar with an action stays until it is tapped.
+        persist: false,
+        action: SnackBarAction(
+          label: 'UNDO',
+          onPressed: () {
+            HabitData.restore(habit, index);
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
+    );
+    _undoBar = bar;
+    // Forget the bar once it is gone, so dispose doesn't close it twice.
+    bar.closed.then((_) {
+      if (identical(_undoBar, bar)) _undoBar = null;
+    });
+  }
+
+  @override
+  void dispose() {
+    // Like My Habits: Undo is only offered while the user stays here.
+    _undoBar?.close();
+    super.dispose();
   }
 
   @override
