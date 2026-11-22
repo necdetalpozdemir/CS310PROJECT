@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/user_session.dart';
 import '../../routes.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_spacing.dart';
@@ -40,6 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
     // message, the message is shown under that field and we stop here.
     final isValid = _formKey.currentState!.validate();
     if (!isValid) return;
+
+    // Remember who logged in; Profile shows a name made from this email.
+    UserSession.logIn(_emailController.text);
 
     // Open the main app and remove Welcome / Log In from the stack,
     // so the back button can't return to the login form.
