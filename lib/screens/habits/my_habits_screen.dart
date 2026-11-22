@@ -9,6 +9,7 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/habit_card.dart';
 import 'add_edit_habit_screen.dart';
+import 'habit_detail_screen.dart';
 
 enum _HabitFilter { all, daily, weekly }
 
@@ -53,16 +54,12 @@ class _MyHabitsScreenState extends State<MyHabitsScreen> {
     if (mounted) setState(() {});
   }
 
-  // Habit Detail is Yusuf's screen. Open it here once it is in the repo.
-  void _openDetail(Habit habit) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text('Habit Detail is coming soon'),
-          margin: _snackBarMargin,
-        ),
-      );
+  Future<void> _openDetail(Habit habit) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
+    );
+    if (mounted) setState(() {});
   }
 
   // Lifts the snackbar above the floating "+" button.
