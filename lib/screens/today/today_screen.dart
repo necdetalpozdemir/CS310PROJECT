@@ -7,7 +7,9 @@ import '../../routes.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_spacing.dart';
 import '../../utils/app_text_styles.dart';
+import '../../utils/date_labels.dart';
 import '../../widgets/habit_card.dart';
+import '../habits/habit_detail_screen.dart';
 
 /// Home screen: a greeting, today's completion bar and only the habits
 /// scheduled for today. Tapping the circle checks a habit off in one tap.
@@ -19,16 +21,6 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen> {
-  static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
-  // "Sun, 22 Nov" – written by hand because the project has no intl package.
-  String _formatDate(DateTime date) =>
-      '${Habit.weekdayNames[date.weekday - 1]}, '
-      '${date.day} ${_months[date.month - 1]}';
-
   String get _greeting {
     final hour = DateTime.now().hour;
     final firstName = UserSession.displayName.split(' ').first;
@@ -48,11 +40,21 @@ class _TodayScreenState extends State<TodayScreen> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _openDetail(Habit habit) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
+    );
+    // The habit may have been checked off, edited or deleted there.
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
-    final habits =
-        HabitData.habits.where((habit) => habit.isScheduledOn(today)).toList();
+    final habits = HabitData.habits
+        .where((habit) => habit.isScheduledOn(today))
+        .toList();
     final doneCount = habits.where((habit) => habit.isDoneOn(today)).length;
     final ratio = habits.isEmpty ? 0.0 : doneCount / habits.length;
 
@@ -63,7 +65,10 @@ class _TodayScreenState extends State<TodayScreen> {
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.lg),
             child: Center(
-              child: Text(_formatDate(today), style: AppTextStyles.caption),
+              child: Text(
+                DateLabels.weekdayDayMonth(today),
+                style: AppTextStyles.caption,
+              ),
             ),
           ),
         ],
@@ -111,8 +116,9 @@ class _TodayScreenState extends State<TodayScreen> {
               child: Text(
                 'Nothing scheduled for today.\nTap + to add a habit.',
                 textAlign: TextAlign.center,
-                style:
-                    AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           for (final habit in habits) ...[
@@ -133,6 +139,7 @@ class _TodayScreenState extends State<TodayScreen> {
       habit: habit,
       subtitle: streak > 0 ? '$streak-day streak' : 'Start a streak today',
       subtitleIcon: streak > 0 ? Icons.local_fire_department : null,
+      onTap: () => _openDetail(habit),
       trailing: IconButton(
         tooltip: done ? 'Mark as not done' : 'Mark as done',
         onPressed: () => _toggle(habit),
