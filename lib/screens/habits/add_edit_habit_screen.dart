@@ -44,9 +44,11 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     );
     _icon = habit?.icon ?? HabitData.icons.first;
     _color = habit?.color ?? AppColors.habitColors.first;
-    _everyDay = habit?.isEveryDay ?? true;
-    // Switching to "Selected days" starts with a useful default.
-    _selectedDays = _everyDay ? {1, 3, 5} : {...habit!.days};
+    _everyDay = habit?.isEveryDay ?? false;
+    // No day is chosen until the user picks one.
+    _selectedDays = habit == null || habit.isEveryDay
+        ? <int>{}
+        : {...habit.days};
   }
 
   @override
@@ -92,6 +94,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       habit
         ..name = name
         ..dailyGoal = goal
+        ..goalUnit = goal == null ? null : habit.goalUnit
         ..icon = _icon
         ..color = _color
         ..days = {...days};
@@ -180,13 +183,18 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                     Validators.notEmpty(value, 'a habit name'),
               ),
               const SizedBox(height: AppSpacing.lg),
-              AppTextField(
-                label: 'Daily goal (optional)',
-                hintText: 'e.g. 10',
+              const Text('Daily goal (optional)', style: AppTextStyles.label),
+              const SizedBox(height: AppSpacing.xs + 2),
+              TextFormField(
                 controller: _goalController,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.done,
                 validator: _validateGoal,
+                decoration: InputDecoration(
+                  hintText: 'e.g. 10',
+                  suffixText: widget.habit?.goalUnit,
+                  errorMaxLines: 2,
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
               const Text('Icon', style: AppTextStyles.label),
@@ -270,7 +278,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       spacing: AppSpacing.md,
       runSpacing: AppSpacing.sm,
       children: [
-        for (final color in AppColors.habitColors)
+        for (final color in AppColors.habitColors.take(5))
           InkWell(
             customBorder: const CircleBorder(),
             onTap: () => setState(() => _color = color),
