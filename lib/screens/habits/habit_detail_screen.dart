@@ -206,7 +206,11 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goal = habit.dailyGoal == null ? '' : ' · goal ${habit.dailyGoal}';
+    // "· goal 60 minutes"; the unit is optional, so it may be just "· goal 60".
+    final unit = habit.goalUnit == null ? '' : ' ${habit.goalUnit}';
+    final goal = habit.dailyGoal == null
+        ? ''
+        : ' · goal ${habit.dailyGoal}$unit';
 
     return Row(
       children: [
