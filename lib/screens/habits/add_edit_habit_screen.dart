@@ -59,7 +59,8 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
   String? _validateGoal(String? value) {
     final text = value?.trim() ?? '';
     if (text.isEmpty) return null;
-    final goal = int.tryParse(text);
+    // Digits only, so values like "0x10" are not read as numbers.
+    final goal = RegExp(r'^\d+$').hasMatch(text) ? int.tryParse(text) : null;
     if (goal == null) return 'Goal must be a number';
     if (goal <= 0) return 'Goal must be greater than 0';
     return null;
