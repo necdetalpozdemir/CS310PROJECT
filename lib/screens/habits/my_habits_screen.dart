@@ -55,11 +55,14 @@ class _MyHabitsScreenState extends State<MyHabitsScreen> {
   }
 
   Future<void> _openDetail(Habit habit) async {
-    await Navigator.push(
+    // Habit Detail returns the habit's old index if it was deleted there.
+    final removedAt = await Navigator.push<int>(
       context,
       MaterialPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
     );
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {});
+    if (removedAt != null) _showUndo(habit, removedAt);
   }
 
   // Lifts the snackbar above the floating "+" button.
@@ -83,7 +86,11 @@ class _MyHabitsScreenState extends State<MyHabitsScreen> {
 
     late final int index;
     setState(() => index = HabitData.remove(habit));
+    _showUndo(habit, index);
+  }
 
+  /// Shows '"Gym" removed' with an UNDO button that puts the habit back.
+  void _showUndo(Habit habit, int index) {
     final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
     final bar = messenger.showSnackBar(
       SnackBar(

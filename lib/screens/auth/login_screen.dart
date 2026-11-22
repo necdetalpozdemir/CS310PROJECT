@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 AppTextField(
                   label: 'Email',
-                  hintText: 'name@sabanciuniv.edu',
+                  hintText: 'example@mail.com',
                   icon: Icons.mail_outline,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
