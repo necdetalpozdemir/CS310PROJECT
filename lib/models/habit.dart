@@ -14,6 +14,7 @@ class Habit {
     required Set<int> days,
     required DateTime createdAt,
     this.dailyGoal,
+    this.goalUnit,
     Set<DateTime>? completedDates,
   }) : days = {...days},
        createdAt = dateOnly(createdAt),
@@ -26,6 +27,9 @@ class Habit {
 
   /// Optional daily target, e.g. 60 for "Study for 60 minutes".
   int? dailyGoal;
+
+  /// Unit shown next to the goal, e.g. "minutes".
+  String? goalUnit;
 
   /// Scheduled weekdays: DateTime.monday (1) ... DateTime.sunday (7).
   Set<int> days;

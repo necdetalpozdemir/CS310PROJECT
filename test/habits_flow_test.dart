@@ -72,6 +72,7 @@ void main() {
     await tester.pump();
     expect(find.text('Please enter a habit name'), findsOneWidget);
     expect(find.text('Goal must be a number'), findsOneWidget);
+    expect(find.text('Select at least one day'), findsOneWidget);
 
     final habit = HabitData.habits[1];
     await tester.pumpWidget(
@@ -81,6 +82,7 @@ void main() {
     expect(find.text('Edit habit'), findsOneWidget);
     expect(find.text('Study for 1 hour'), findsOneWidget);
     expect(find.text('60'), findsOneWidget);
+    expect(find.text('minutes'), findsOneWidget);
     expect(find.text('Save changes'), findsOneWidget);
   });
 
