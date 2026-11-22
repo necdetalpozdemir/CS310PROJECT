@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:myhabits/data/habit_data.dart';
+import 'package:myhabits/data/user_session.dart';
 import 'package:myhabits/routes.dart';
 import 'package:myhabits/screens/auth/signup_screen.dart';
 import 'package:myhabits/screens/habits/add_edit_habit_screen.dart';
 import 'package:myhabits/screens/habits/my_habits_screen.dart';
+import 'package:myhabits/screens/main_shell.dart';
 import 'package:myhabits/utils/app_theme.dart';
 
 Widget _app(Widget home) => MaterialApp(
@@ -99,5 +101,26 @@ void main() {
     expect(find.text('Enter a valid email address'), findsOneWidget);
     expect(find.text('Passwords do not match'), findsOneWidget);
     expect(find.text('Please agree to the terms to continue'), findsOneWidget);
+  });
+
+  testWidgets('valid sign up saves the user and opens Today', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_app(const SignUpScreen()));
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Ayse');
+    await tester.enterText(fields.at(1), 'ayse@mail.com');
+    await tester.enterText(fields.at(2), 'secret1');
+    await tester.enterText(fields.at(3), 'secret1');
+    await tester.tap(find.byType(Checkbox));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Create account'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MainShell), findsOneWidget);
+    expect(UserSession.displayName, 'Ayse');
+    expect(UserSession.email, 'ayse@mail.com');
   });
 }

@@ -36,6 +36,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  // Same rule as "Edit display name" on Profile.
+  String? _validateName(String? value) {
+    final error = Validators.notEmpty(value, 'your display name');
+    if (error != null) return error;
+    if (value!.trim().length > 30) return 'Name must be 30 characters or fewer';
+    return null;
+  }
+
   String? _validateConfirm(String? value) {
     if (value == null || value.isEmpty) return 'Please confirm your password';
     if (value != _passwordController.text) return 'Passwords do not match';
@@ -82,17 +90,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: AppSpacing.xl),
                 AppTextField(
                   label: 'Display name',
-                  hintText: 'Alp',
+                  hintText: 'Name',
                   icon: Icons.person_outline,
                   controller: _nameController,
                   textInputAction: TextInputAction.next,
-                  validator: (value) =>
-                      Validators.notEmpty(value, 'your display name'),
+                  validator: _validateName,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 AppTextField(
                   label: 'Email',
-                  hintText: 'name@sabanciuniv.edu',
+                  hintText: 'example@mail.com',
                   icon: Icons.mail_outline,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
